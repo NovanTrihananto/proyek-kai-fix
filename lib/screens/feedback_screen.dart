@@ -82,9 +82,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 // Ilustrasi Gambar
                 Center(
                   child: Image.asset(
-                    'assets/images/train_station.png', // Pastikan file ini tersedia
-                    height: 180,
+                    'assets/images/kereta.png', // Pastikan file ini tersedia
+                    height: 300,
                     fit: BoxFit.contain,
+                    width: 300,
                   ),
                 ),
                 const SizedBox(height: 20),

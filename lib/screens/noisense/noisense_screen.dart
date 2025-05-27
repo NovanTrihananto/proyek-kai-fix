@@ -9,12 +9,36 @@ class NoisenseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.noisense)),
+      appBar: AppBar(
+        title: Text(
+          AppStrings.noisense,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF8A2387), Color(0xFFE94057)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Center(
+              child: Image.asset(
+                'assets/images/kereta.jpg', // Pastikan file ini tersedia
+                height: 180,
+                fit: BoxFit.contain,
+              ),
+            ),
+            SizedBox(height: 10),
             // Info Card
             Card(
               shape: RoundedRectangleBorder(
@@ -48,10 +72,10 @@ class NoisenseScreen extends StatelessWidget {
 
             // Scan QR Button
             ElevatedButton.icon(
-              onPressed:
-                  () => Navigator.pushNamed(context, Routes.barcodeScanner),
+              onPressed: () => Navigator.pushNamed(context, Routes.barcodeScanner),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: Color(0xFFEB6A28), // warna oranye
+                foregroundColor: Colors.black, // warna teks & ikon
                 padding: EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -60,7 +84,11 @@ class NoisenseScreen extends StatelessWidget {
               icon: Icon(Icons.qr_code_scanner),
               label: Text(
                 "Pindai QR Code",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black, // pastikan teks tetap hitam
+                ),
               ),
             ),
 

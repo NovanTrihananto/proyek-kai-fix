@@ -32,6 +32,7 @@ dependencies:
   google_maps_flutter: ^2.5.0
   geolocator: ^10.1.0
   shared_preferences: ^2.2.2
+  intl: ^0.18.1
   flutter:
     sdk: flutter
 
@@ -46,6 +47,7 @@ dependencies:
   url_launcher: ^6.3.1
   audioplayers: ^6.4.0
   flutter_local_notifications: ^19.2.1
+  
 
 dev_dependencies:
   flutter_test:

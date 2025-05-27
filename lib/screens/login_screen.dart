@@ -68,10 +68,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Gambar Logo Noisense
-                    Image.asset('assets/images/noisense.png', height: 100),
+                    Image.asset('assets/images/feedlog.jpg', height: 200, width: 200,),
                     SizedBox(height: 24),
                     Text(
                       AppStrings.appName,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "Login sebagai tamu",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
@@ -115,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-
+                    SizedBox(height: 20,),
                     TextFormField(
                       controller: _instansiController,
                       decoration: InputDecoration(
@@ -156,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ElevatedButton(
                       onPressed: _isLoading ? null : _login,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary, // Biru dongker
+                        backgroundColor: const Color(0xFF2C2A6B), // Biru dongker
                         padding: EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

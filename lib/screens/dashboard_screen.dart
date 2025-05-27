@@ -161,7 +161,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         children: [
                           CircleAvatar(
                             radius: 24,
-                            backgroundImage: AssetImage('assets/avatar.png'),
+                            backgroundImage: AssetImage(
+                              'assets/images/avatar.png',
+                            ),
                           ),
                           SizedBox(width: 12),
                           Column(
@@ -234,9 +236,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: PageView(
                         controller: _pageController,
                         children: [
-                          buildSliderImage('assets/images/jogja.jpg'),
-                          buildSliderImage('assets/images/solo.jpg'),
-                          buildSliderImage('assets/images/sukoharjo.jpg'),
+                          buildSliderImage('assets/images/jogja.JPG'),
+                          buildSliderImage('assets/images/solo.JPG'),
+                          buildSliderImage('assets/images/sukoharjo.JPG'),
                           buildSliderImage('assets/images/sragen.jpeg'),
                         ],
                       ),
@@ -327,12 +329,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     _buildDepoCard(
                       'Depo Gerbong Rewulu',
-                      'assets/images/rewulu.jpg',
+                      'assets/images/rewulu.JPG',
                       'Rewulu',
                     ),
                     _buildDepoCard(
                       'Depo PUK Yogyakarta',
-                      'assets/images/puk.jpg',
+                      'assets/images/puk.JPG',
                       'Yogyakarta',
                     ),
                   ],

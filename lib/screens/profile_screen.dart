@@ -68,7 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundImage:
                     user['profileImageUrl']!.isNotEmpty
                         ? NetworkImage(user['profileImageUrl']!)
-                        : const AssetImage('assets/images/profile.png')
+                        : const AssetImage('assets/images/avatar.png')
                             as ImageProvider,
               ),
               const SizedBox(height: 16),

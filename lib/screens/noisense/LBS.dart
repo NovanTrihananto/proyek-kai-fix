@@ -166,15 +166,31 @@ class _LBSState extends State<LBS> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.red[700],
-          title: const Text(
-            "⚠️ PERINGATAN!",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: const Color(0xFF333232),
+          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+          contentPadding: const EdgeInsets.all(24),
+          title: Column(
+            children: const [
+              Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent, size: 48),
+              SizedBox(height: 16),
+              Text(
+                "Peringatan!",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
           content: const Text(
-            "BAHAYA DESIBEL TINGGI\nGunakan alat pelindung telinga!",
-            style: TextStyle(color: Colors.white),
+            "Anda telah memasuki zona merah dengan tingkat kebisingan tinggi",
+            style: TextStyle(color: Colors.white70, fontSize: 16),
+            textAlign: TextAlign.center,
           ),
+          actionsAlignment: MainAxisAlignment.center,
           actions: [
             TextButton(
               onPressed: () {
@@ -184,7 +200,17 @@ class _LBSState extends State<LBS> {
                 _stopAlertSoundLoop();
                 Navigator.of(context).pop();
               },
-              child: const Text("Tutup", style: TextStyle(color: Colors.white)),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.orange,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: const Text(
+                "CLOSE",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         );
@@ -323,8 +349,8 @@ class _LBSState extends State<LBS> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Deteksi Lokasi LBS"),
-        backgroundColor: Colors.blueAccent,
-      ),
+        backgroundColor: const Color(0xFF333232),
+      ),  
       body: Column(
         children: [
           Expanded(
@@ -343,19 +369,18 @@ class _LBSState extends State<LBS> {
             ),
           ),
           Container(
+            height: 120,
             padding: const EdgeInsets.all(16),
-            color: Colors.white,
+            color: const Color(0xFF333232), // Setting the desired background color
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(_statusMessage, style: const TextStyle(fontSize: 16)),
+                  Text(_statusMessage, style: const TextStyle(fontSize: 16, color: Colors.white)), // Adjust text color for better visibility on dark background
                   const SizedBox(height: 10),
-                  if (_triggerStatus.isNotEmpty)
-                    ..._triggerStatus.map(
-                      (status) =>
-                          Text(status, style: const TextStyle(fontSize: 14)),
-                    ),
+                  if (_triggerStatus.isNotEmpty)..._triggerStatus.map(
+                    (status) => Text(status, style: const TextStyle(fontSize: 14, color: Colors.white70)), // Adjust text color for better visibility on dark background
+                  ),
                 ],
               ),
             ),

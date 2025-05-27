@@ -53,7 +53,6 @@ class MyApp extends StatelessWidget {
       home: const SplashScreen(),
       routes: {
         Routes.splash: (context) => const SplashScreen(),
-        //Routes.barcodeScanner: (context) => const BarcodeScannerPage(),
         Routes.login: (context) => const LoginScreen(),
         Routes.dashboard: (context) => const DashboardScreen(),
         Routes.profile: (context) => const ProfileScreen(),
