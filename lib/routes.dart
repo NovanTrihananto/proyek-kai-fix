@@ -11,4 +11,6 @@ class Routes {
   static const String panduan = '/panduan';
   static const String saranaPrasarana = '/sarana_prasarana';
   static const String locationInfoSarana = '/location_info_sarana';
+  static const String detailDepo = '/depo_detail';
+  static const String edukasi = '/sarana_detail';
 }

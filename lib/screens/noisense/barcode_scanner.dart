@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kai/screens/dashboard_screen.dart';
-import 'package:kai/screens/noisense/noisense_screen.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:kai/screens/noisense/LBS.dart';
 

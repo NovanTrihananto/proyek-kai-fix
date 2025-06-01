@@ -21,7 +21,7 @@ class _LBSState extends State<LBS> {
   GoogleMapController? _mapController;
   LatLng _initialCameraPosition = const LatLng(-6.200000, 106.816666);
   final AudioPlayer _audioPlayer = AudioPlayer();
-  bool _sudahBunyikan = false;
+  final bool _sudahBunyikan = false;
 
   Set<Marker> _markers = {};
   Set<Polygon> _polygons = {};

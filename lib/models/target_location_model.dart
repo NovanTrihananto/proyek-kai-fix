@@ -4,14 +4,13 @@ class LokasiTrigger {
   LokasiTrigger({this.lokasi});
 
   LokasiTrigger.fromJson(Map<String, dynamic> json) {
-    lokasi =
-        json['lokasi'] != null ? new Lokasi.fromJson(json['lokasi']) : null;
+    lokasi = json['lokasi'] != null ? Lokasi.fromJson(json['lokasi']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.lokasi != null) {
-      data['lokasi'] = this.lokasi!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (lokasi != null) {
+      data['lokasi'] = lokasi!.toJson();
     }
     return data;
   }
@@ -28,17 +27,16 @@ class Lokasi {
     if (json['lokasi_bising'] != null) {
       lokasiBising = <LokasiBising>[];
       json['lokasi_bising'].forEach((v) {
-        lokasiBising!.add(new LokasiBising.fromJson(v));
+        lokasiBising!.add(LokasiBising.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['nama'] = this.nama;
-    if (this.lokasiBising != null) {
-      data['lokasi_bising'] =
-          this.lokasiBising!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['nama'] = nama;
+    if (lokasiBising != null) {
+      data['lokasi_bising'] = lokasiBising!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -71,13 +69,13 @@ class LokasiBising {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['nama'] = this.nama;
-    data['tingkat_kebisingan_estimasi'] = this.tingkatKebisinganEstimasi;
-    data['keterangan'] = this.keterangan;
-    data['longitude'] = this.longitude;
-    data['latitude'] = this.latitude;
-    data['triggerRadiusMeter'] = this.triggerRadiusMeter;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['nama'] = nama;
+    data['tingkat_kebisingan_estimasi'] = tingkatKebisinganEstimasi;
+    data['keterangan'] = keterangan;
+    data['longitude'] = longitude;
+    data['latitude'] = latitude;
+    data['triggerRadiusMeter'] = triggerRadiusMeter;
     return data;
   }
 }
@@ -126,6 +124,14 @@ List<LokasiTrigger> triggerListLocation = [
           keterangan: '',
           longitude: 110.3607883210834,
           latitude: -7.788460708175744,
+          triggerRadiusMeter: 20,
+        ),
+        LokasiBising(
+          nama: 'Depo qu Yogyakarta',
+          tingkatKebisinganEstimasi: 'Tinggi',
+          keterangan: '',
+          longitude: 110.326089,
+          latitude: -7.801827,
           triggerRadiusMeter: 20,
         ),
         LokasiBising(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kai/screens/fitur/edukasi_screen.dart';
 import 'routes.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
@@ -9,7 +10,7 @@ import 'screens/noisense/noisense_screen.dart';
 import 'screens/noisense/location_info_screen.dart';
 import 'screens/feedback_screen.dart';
 import 'screens/panduan_screen.dart';
-import 'screens/sarana_prasarana/sarana_screen.dart';
+import 'screens/fitur/sarana_screen.dart';
 import 'screens/noisense/barcode_scanner.dart';
 import 'constants/colors.dart';
 
@@ -58,10 +59,10 @@ class MyApp extends StatelessWidget {
         Routes.profile: (context) => const ProfileScreen(),
         Routes.barcodeScanner: (context) => const BarcodeScannerPage(),
         Routes.noisense: (context) => const NoisenseScreen(),
-        Routes.locationInfo: (context) => const MapScreen(),
+        // Routes.locationInfo: (context) => const MapScreen(),
         Routes.feedback: (context) => const FeedbackScreen(),
         Routes.panduan: (context) => const PanduanScreen(),
-        Routes.saranaPrasarana: (context) => const SaranaPrasaranaScreen(),
+        Routes.edukasi: (context) => const EdukasiScreen(),
       },
     );
   }

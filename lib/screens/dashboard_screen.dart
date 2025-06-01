@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'dart:async';
+import 'package:flutter/material.dart';
 import '../constants/colors.dart';
 import '../routes.dart';
 import '../services/auth_service.dart';
 import '../models/user_model.dart';
+import 'fitur/sarana_screen.dart'; // Impor DepoDetailPage yang sudah diperbaiki
+import '../models/depo_model.dart'; // Impor DepotModel
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -15,21 +16,96 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final AuthService _authService = AuthService();
-  final PageController _pageController = PageController(viewportFraction: 0.9);
   UserModel? _currentUser;
-  Timer? _autoSlideTimer;
   bool _isLoading = true;
+
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  // Definisikan data depo Anda di sini dengan dua jalur gambar berbeda
+  final List<DepoModel> _depots = [
+    DepoModel(
+      title: 'Depo Lokomotif Yogyakarta',
+      thumbnailImagePath: 'assets/images/lokoj.jpg', // Gambar untuk thumbnail
+      detailImagePath: 'assets/maps/lokoy.png', // Gambar berbeda untuk halaman detail
+      description:
+          'Depo Lokomotif Yogyakarta merupakan fasilitas pemeliharaan dan perawatan lokomotif yang mendukung operasional kereta api di wilayah Yogyakarta.',
+      employeeCount: '45 orang',
+      equipmentDescription:
+          'Terdapat peralatan untuk perawatan lokomotif seperti mesin las, lifting jack, dan alat ukur tekanan.',
+      capabilities:
+          'Depo ini mampu melakukan perawatan rutin, perbaikan kerusakan ringan hingga sedang, serta inspeksi keselamatan berkala terhadap lokomotif.',
+    ),
+    DepoModel(
+      title: 'Depo Lokomotif Solo Balapan',
+      thumbnailImagePath: 'assets/images/lokos.jpg',
+      detailImagePath: 'assets/maps/lokos.png', // Gambar detail yang berbeda
+      description:
+          'Depo Lokomotif Solo Balapan merupakan fasilitas pemeliharaan dan perawatan lokomotif yang mendukung operasional kereta api di wilayah Solo.',
+      employeeCount: '40 orang',
+      equipmentDescription:
+          'Dilengkapi dengan fasilitas perbaikan engine, sistem kelistrikan, dan bogie lokomotif.',
+      capabilities:
+          'Depo ini memiliki kemampuan untuk overhaul lokomotif, perbaikan kerusakan berat, dan pengujian performa mesin.',
+    ),
+    DepoModel(
+      title: 'Depo Kereta Yogyakarta',
+      thumbnailImagePath: 'assets/images/keretaj.png',
+      detailImagePath: 'assets/maps/keretay.png', // Gambar detail yang berbeda
+      description:
+          'Depo Kereta Yogyakarta merupakan fasilitas pemeliharaan dan perawatan kereta penumpang yang mendukung operasional kereta api di wilayah Yogyakarta.',
+      employeeCount: '55 orang',
+      equipmentDescription:
+          'Terdapat berbagai peralatan untuk perawatan interior, AC, sistem pintu, dan sistem kelistrikan kereta penumpang.',
+      capabilities:
+          'Depo ini mampu melakukan perawatan harian, bulanan, hingga tahunan untuk kereta penumpang, serta perbaikan kerusakan major.',
+    ),
+    DepoModel(
+      title: 'Depo Kereta Solo Balapan',
+      thumbnailImagePath: 'assets/images/keretas.jpeg',
+      detailImagePath: 'assets/maps/keretas.png', // Gambar detail yang berbeda
+      description:
+          'Depo Kereta Solo Balapan merupakan fasilitas pemeliharaan dan perawatan kereta penumpang yang mendukung operasional kereta api di wilayah Solo.',
+      employeeCount: '38 orang',
+      equipmentDescription:
+          'Fasilitas mencakup area pencucian otomatis, perbaikan sistem penerangan, dan pengecekan roda kereta.',
+      capabilities:
+          'Melayani inspeksi rutin, perbaikan minor, dan persiapan kereta sebelum keberangkatan untuk rute jarak dekat.',
+    ),
+    DepoModel(
+      title: 'Depo Gerbong Rewulu',
+      thumbnailImagePath: 'assets/images/rewulu.JPG',
+      detailImagePath: 'assets/maps/rewulu.png', // Gambar detail yang berbeda
+      description:
+          'Depo Gerbong Rewulu merupakan pusat perawatan dan perbaikan gerbong barang yang vital untuk distribusi logistik kereta api.',
+      employeeCount: '60 orang',
+      equipmentDescription:
+          'Dilengkapi dengan crane berkapasitas besar, alat press roda, dan area khusus untuk perbaikan sasis gerbong.',
+      capabilities:
+          'Depo ini mampu melakukan perbaikan struktur gerbong, penggantian roda, dan pengujian beban untuk berbagai jenis gerbong barang.',
+    ),
+    DepoModel(
+      title: 'Depo PUK Yogyakarta',
+      thumbnailImagePath: 'assets/images/puk.JPG',
+      detailImagePath: 'assets/maps/puky.png', // Gambar detail yang berbeda
+      description:
+          'Depo PUK (Perawatan Unit Khusus) Yogyakarta menangani perawatan dan perbaikan unit khusus perkeretaapian, seperti kereta inspeksi, kereta derek, dan alat berat rel.',
+      employeeCount: '30 orang',
+      equipmentDescription:
+          'Spesialisasi pada alat diagnostik elektronik, perbaikan sistem hidrolik, dan komponen presisi untuk unit khusus.',
+      capabilities:
+          'Fokus pada perawatan preventif dan korektif untuk memastikan kesiapan operasional unit khusus dalam mendukung infrastruktur dan keselamatan perkeretaapian.',
+    ),
+  ];
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
-    _startAutoSlide();
   }
 
   @override
   void dispose() {
-    _autoSlideTimer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
@@ -39,20 +115,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       _currentUser = user;
       _isLoading = false;
-    });
-  }
-
-  void _startAutoSlide() {
-    _autoSlideTimer = Timer.periodic(Duration(seconds: 4), (_) {
-      if (_pageController.hasClients) {
-        int nextPage = _pageController.page!.round() + 1;
-        if (nextPage >= 4) nextPage = 0;
-        _pageController.animateToPage(
-          nextPage,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      }
     });
   }
 
@@ -66,40 +128,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
             backgroundColor: AppColors.primary,
             child: Icon(icon, color: Colors.white),
           ),
-          SizedBox(height: 6),
-          Text(label, style: TextStyle(fontSize: 14)),
+          const SizedBox(height: 6),
+          Text(label, style: const TextStyle(fontSize: 14)),
         ],
       ),
     );
   }
 
-  Widget buildSliderImage(String assetPath) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.asset(
-          assetPath,
-          fit: BoxFit.cover,
-          width: double.infinity,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDepoCard(String title, String imagePath, String argument) {
+  // Fungsi tunggal untuk membangun kartu depo
+  Widget _buildDepoCard(DepoModel depot) {
     return GestureDetector(
-      onTap:
-          () => Navigator.pushNamed(
-            context,
-            Routes.saranaPrasarana,
-            arguments: argument,
+      onTap: () {
+        // Navigasi ke DepoDetailPage, meneruskan seluruh objek DepotModel
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DepoDetailPage(
+              title: depot.title,
+              detailImagePath: depot.detailImagePath, // <-- Meneruskan detailImagePath
+              description: depot.description,
+              employeeCount: depot.employeeCount,
+              equipmentDescription: depot.equipmentDescription,
+              capabilities: depot.capabilities,
+            ),
           ),
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           image: DecorationImage(
-            image: AssetImage(imagePath),
+            image: AssetImage(depot.thumbnailImagePath), // <-- Menggunakan thumbnailImagePath
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.black.withOpacity(0.3),
@@ -108,10 +167,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         alignment: Alignment.bottomLeft,
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(12),
         child: Text(
-          title,
-          style: TextStyle(
+          depot.title,
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
@@ -124,7 +183,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -136,8 +195,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               // Header
               Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Color(0xFF8A2387), Color(0xFFE94057)],
                     begin: Alignment.topLeft,
@@ -154,22 +213,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Routes.profile,
                         );
                         if (result == 'updated') {
-                          _loadUserData(); // muat ulang data user setelah kembali
+                          _loadUserData();
                         }
                       },
                       child: Row(
                         children: [
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 24,
                             backgroundImage: AssetImage(
                               'assets/images/avatar.png',
                             ),
                           ),
-                          SizedBox(width: 12),
+                          const SizedBox(width: 12),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Selamat Datang!',
                                 style: TextStyle(
                                   fontSize: 12,
@@ -178,7 +237,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                               Text(
                                 _currentUser?.username ?? '',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -187,7 +246,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               if (_currentUser?.instansi != null)
                                 Text(
                                   _currentUser!.instansi,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.white70,
                                   ),
@@ -198,23 +257,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.notifications, color: Colors.white),
+                      icon: const Icon(Icons.notifications, color: Colors.white),
                       onPressed: () {},
                     ),
                   ],
                 ),
               ),
 
-              SizedBox(height: 20),
+              // Gambar statis (tanpa slider)
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'assets/images/dash.jpg', // pilih salah satu dari _sliderImages
+                    height: 180,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
 
               // Logo & Description
               Center(
                 child: Column(
                   children: [
                     Image.asset('assets/images/noisense.png', height: 50),
-                    SizedBox(height: 4),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    const SizedBox(height: 4),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         "Merupakan aplikasi yang dapat membantu pengguna dalam mengetahui zona dengan tingkat kebisingan secara real-time.",
                         textAlign: TextAlign.center,
@@ -225,48 +297,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 24),
 
-              // Image Slider
-              SizedBox(
-                height: 220,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: PageView(
-                        controller: _pageController,
-                        children: [
-                          buildSliderImage('assets/images/jogja.JPG'),
-                          buildSliderImage('assets/images/solo.JPG'),
-                          buildSliderImage('assets/images/sukoharjo.JPG'),
-                          buildSliderImage('assets/images/sragen.jpeg'),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    SmoothPageIndicator(
-                      controller: _pageController,
-                      count: 4,
-                      effect: WormEffect(
-                        dotHeight: 8,
-                        dotWidth: 8,
-                        spacing: 8,
-                        dotColor: Colors.grey.shade300,
-                        activeDotColor: AppColors.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 24),
-
-              // Menu Buttons
+              // Tombol Menu
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    buildMenuButton(
+                      'Panduan',
+                      Icons.menu_book,
+                      () => Navigator.pushNamed(context, Routes.panduan),
+                    ),
+                    buildMenuButton(
+                      'Edukasi',
+                      Icons.school,
+                      () => Navigator.pushNamed(context, Routes.edukasi),
+                    ),
                     buildMenuButton(
                       'NoiSense',
                       Icons.wifi_tethering,
@@ -277,87 +325,59 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Icons.feedback,
                       () => Navigator.pushNamed(context, Routes.feedback),
                     ),
-                    buildMenuButton(
-                      'Panduan',
-                      Icons.menu_book,
-                      () => Navigator.pushNamed(context, Routes.panduan),
-                    ),
                   ],
                 ),
               ),
 
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-              // Sarana dan Prasarana
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+              // Sarana dan Prasarana (Kartu Depo)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
                   'Sarana dan Prasarana',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GridView.count(
-                  crossAxisCount: 2,
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 3 / 2,
+                  ),
+                  itemCount: _depots.length,
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 3 / 2,
-                  children: [
-                    _buildDepoCard(
-                      'Depo Lokomotif Yogyakarta',
-                      'assets/images/lokoj.jpg',
-                      'Yogyakarta',
-                    ),
-                    _buildDepoCard(
-                      'Depo Lokomotif Solo Balapan',
-                      'assets/images/lokos.jpg',
-                      'Solo Balapan',
-                    ),
-                    _buildDepoCard(
-                      'Depo Kereta Yogyakarta',
-                      'assets/images/keretaj.png',
-                      'Yogyakarta',
-                    ),
-                    _buildDepoCard(
-                      'Depo Kereta Solo Balapan',
-                      'assets/images/keretas.jpeg',
-                      'Solo Balapan',
-                    ),
-                    _buildDepoCard(
-                      'Depo Gerbong Rewulu',
-                      'assets/images/rewulu.JPG',
-                      'Rewulu',
-                    ),
-                    _buildDepoCard(
-                      'Depo PUK Yogyakarta',
-                      'assets/images/puk.JPG',
-                      'Yogyakarta',
-                    ),
-                  ],
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return _buildDepoCard(_depots[index]);
+                  },
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
 
-      // Bottom Navigation
+      // Navigasi Bawah
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         onTap: (index) async {
           if (index == 1) {
             final result = await Navigator.pushNamed(context, Routes.profile);
             if (result == 'updated') {
-              _loadUserData(); // refresh jika kembali dari profile
+              _loadUserData();
             }
           }
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kai/models/user_model.dart';
-import 'package:kai/screens/edit_profile.dart';
+import 'package:kai/services/edit_profile.dart';
 import '../services/auth_service.dart';
 import '../constants/colors.dart';
 
