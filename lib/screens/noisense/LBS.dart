@@ -274,7 +274,7 @@ class _LBSState extends State<LBS> {
         Color strokeColor = Colors.green;
 
         if (tingkat == "tinggi") {
-          status = "🔴 ${bising.nama} - Tingkat kebisingan: Tinggi";
+          status = "🔴 ${bising.nama} - Tingkat kebisingan: ${bising.tingkatKebisinganEstimasi}";
           hue = BitmapDescriptor.hueRed;
           fillColor = Colors.red.withOpacity(0.3);
           strokeColor = Colors.red;

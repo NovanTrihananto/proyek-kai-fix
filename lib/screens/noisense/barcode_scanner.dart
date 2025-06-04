@@ -1,6 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:kai/models/target_location_model.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:kai/screens/noisense/LBS.dart';
+import 'package:kai/screens/noisense/barcode_helper_history.dart';
+import 'package:kai/screens/noisense/LBS.dart';// Berisi triggerListLocation
+
+// Fungsi untuk memvalidasi apakah nilai QR cocok dengan nama lokasi bising
+bool isValidLokasi(String scannedValue) {
+  for (var trigger in triggerListLocation) {
+    final lokasi = trigger.lokasi;
+    if (lokasi != null) {
+        // Cocokkan dengan nama lokasi (tanpa sensitif huruf besar/kecil)
+        if (lokasi.nama?.toLowerCase() == scannedValue.toLowerCase()) {
+          return true;
+      }
+    }
+  }
+  return false;
+}
 
 class BarcodeScannerPage extends StatefulWidget {
   const BarcodeScannerPage({super.key});
@@ -10,7 +26,7 @@ class BarcodeScannerPage extends StatefulWidget {
 }
 
 class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
-  bool _isScanned = false;
+  bool _isScanned = false; // Untuk mencegah pemindaian ganda
 
   @override
   Widget build(BuildContext context) {
@@ -20,18 +36,18 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
         title: const Text(
           'Barcode Scanner',
           style: TextStyle(
-            color: Color(0xFF2C2A6B), // Warna teks
+            color: Color(0xFF2C2A6B),
             fontWeight: FontWeight.bold,
           ),
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF2C2A6B)), // Warna ikon navigasi (misalnya panah back)
-        elevation: 1, // Tambahan opsional agar ada bayangan tipis
+        iconTheme: const IconThemeData(color: Color(0xFF2C2A6B)),
+        elevation: 1,
       ),
-
       body: Stack(
         children: [
+          // Komponen scanner dari package mobile_scanner
           MobileScanner(
-            onDetect: (capture) {
+            onDetect: (capture) async {
               if (_isScanned) return;
 
               final List<Barcode> barcodes = capture.barcodes;
@@ -41,20 +57,44 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
               if (value != null && value.isNotEmpty) {
                 setState(() => _isScanned = true);
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LBS(barcode: value)),
-                ).then((_) {
-                  // Reset scanner
-                  setState(() => _isScanned = false);
-                });
+                // Validasi nama lokasi dari barcode
+                if (isValidLokasi(value)) {
+                  // Simpan ke history
+                  await BarcodeHistoryHelper.addToHistory(value);
+
+                  // Arahkan ke halaman LBS
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LBS(barcode: value)),
+                  ).then((_) {
+                    setState(() => _isScanned = false); // Reset scanner saat kembali
+                  });
+                } else {
+                  // Barcode tidak sesuai dengan data lokasi
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text("QR Tidak Valid"),
+                      content: Text("Kode QR tidak sesuai dengan lokasi yang terdaftar."),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            setState(() => _isScanned = false);
+                          },
+                          child: Text("OK"),
+                        ),
+                      ],
+                    ),
+                  );
+                }
               }
             },
           ),
 
-          // Keterangan teks di atas
+          // Tampilan overlay kotak panduan QR
           Positioned(
-            top: 100, // atur sesuai kebutuhan untuk posisi atas
+            top: 100,
             left: 0,
             right: 0,
             child: Column(
