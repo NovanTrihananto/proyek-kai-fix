@@ -136,14 +136,6 @@ class DepoDetailPage extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // Deskripsi singkat tanpa ikon
-                  Text(
-                    'Deskripsi Singkat',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple.shade700,
-                    ),
-                  ),
                   const SizedBox(height: 12),
                   _InfoCard(
                     icon: null,
