@@ -13,51 +13,49 @@ class EdukasiScreen extends StatelessWidget {
           'Edukasi Kebisingan',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor:
-            AppColors.primary, // Warna ungu gelap dari AppColors.primary
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ), // Warna ikon kembali
+        backgroundColor: AppColors.primary,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header dengan ilustrasi menarik
             _buildEdukasiHeader(),
             const SizedBox(height: 20),
-
-            // Bagian 1: Batas Aman Desibel
             _buildSectionTitle('1. Kenali Batas Aman Desibelmu!'),
             _buildDesibelInfo(context),
             const SizedBox(height: 20),
-
-            // Bagian 2: Lindungi Telingamu dengan APD
             _buildSectionTitle('2. Lindungi Telingamu dengan APD!'),
             _buildAPDInfo(context),
             const SizedBox(height: 20),
-
-            // Bagian 3: Dampak Buruk Kebisingan
             _buildSectionTitle('3. Jangan Anggap Remeh: Dampak Kebisingan!'),
             _buildDampakInfo(context),
             const SizedBox(height: 20),
-
-            // Call to Action
-            _buildCallToAction(context), // Meneruskan context ke fungsi
+            _buildCallToAction(context),
+            const SizedBox(height: 20),
+            const Center(
+              child: Text(
+                '📄 Informasi dalam halaman ini mengacu pada:\nPermenakertrans No. PER.13/MEN/X/2011\nTentang Nilai Ambang Batas Faktor Fisika di Tempat Kerja',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  // --- Widget Pembantu ---
-
   Widget _buildEdukasiHeader() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1), // Sedikit transparan
+        color: AppColors.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: AppColors.primary),
       ),
@@ -88,7 +86,7 @@ class EdukasiScreen extends StatelessWidget {
           Expanded(
             flex: 1,
             child: Image.asset(
-              'assets/edukasi/peringatan.png', // Ganti dengan ilustrasi yang menarik
+              'assets/edukasi/peringatan.png',
               fit: BoxFit.contain,
               height: 100,
             ),
@@ -128,15 +126,24 @@ class EdukasiScreen extends StatelessWidget {
               textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 15),
-            // Infografis sederhana atau tabel
             Image.asset(
-              'assets/edukasi/chart.png', // Ganti dengan infografis batas aman desibel
+              'assets/edukasi/chart.png',
               fit: BoxFit.fitWidth,
             ),
             const SizedBox(height: 10),
             const Text(
               'Penting: Paparan kebisingan di atas 85 dB (setara suara lalu lintas padat) dalam jangka panjang bisa merusak pendengaranmu!',
               style: TextStyle(fontStyle: FontStyle.italic, color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Sumber: Permenakertrans No. PER.13/MEN/X/2011 tentang Nilai Ambang Batas Faktor Fisika di Tempat Kerja.',
+              style: TextStyle(
+                fontSize: 12,
+                fontStyle: FontStyle.italic,
+                color: Colors.black54,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -164,15 +171,14 @@ class EdukasiScreen extends StatelessWidget {
               textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 10),
-            // Daftar jenis APD dengan ikon/gambar
             _buildAPDItem(
               'Penyumbat Telinga (Earplugs)',
-              'assets/edukasi/earplug.jpg', // Ikon/gambar earplugs
+              'assets/edukasi/earplug.jpg',
               'Kecil, praktis, dan efektif untuk mengurangi kebisingan sedang. Cocok untuk konser atau bekerja dengan mesin yang tidak terlalu bising.',
             ),
             _buildAPDItem(
               'Penutup Telinga (Earmuffs)',
-              'assets/edukasi/earmuff.jpg', // Ikon/gambar earmuffs
+              'assets/edukasi/earmuff.jpg',
               'Lebih besar dan mampu meredam suara lebih kuat. Ideal untuk lingkungan dengan kebisingan sangat tinggi, seperti di dekat pesawat atau mesin industri.',
             ),
             const SizedBox(height: 10),
@@ -181,6 +187,16 @@ class EdukasiScreen extends StatelessWidget {
               style: TextStyle(
                 fontStyle: FontStyle.italic,
                 color: Colors.green,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Sumber: Permenakertrans No. PER.13/MEN/X/2011 – Pasal 5 dan 6 mengenai kewajiban penyediaan dan penggunaan APD di lingkungan kerja bising.',
+              style: TextStyle(
+                fontSize: 12,
+                fontStyle: FontStyle.italic,
+                color: Colors.black54,
               ),
               textAlign: TextAlign.center,
             ),
@@ -231,28 +247,25 @@ class EdukasiScreen extends StatelessWidget {
               textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 10),
-            // Daftar dampak dengan ikon/bullet point
-            _buildDampakListItem(
-              Icons.hearing_disabled,
-              'Kerusakan Pendengaran Permanen',
-            ),
-            _buildDampakListItem(
-              Icons.headset_off,
-              'Tinnitus (Telinga Berdenging)',
-            ),
+            _buildDampakListItem(Icons.hearing_disabled, 'Kerusakan Pendengaran Permanen'),
+            _buildDampakListItem(Icons.headset_off, 'Tinnitus (Telinga Berdenging)'),
             _buildDampakListItem(Icons.mood_bad, 'Stres dan Gangguan Tidur'),
-            _buildDampakListItem(
-              Icons.health_and_safety,
-              'Peningkatan Risiko Penyakit Jantung',
-            ),
-            _buildDampakListItem(
-              Icons.accessibility_new,
-              'Gangguan Konsentrasi dan Produktivitas',
-            ),
+            _buildDampakListItem(Icons.health_and_safety, 'Peningkatan Risiko Penyakit Jantung'),
+            _buildDampakListItem(Icons.accessibility_new, 'Gangguan Konsentrasi dan Produktivitas'),
             const SizedBox(height: 10),
             const Text(
               'Jaga pendengaranmu, karena sekali rusak, sulit untuk pulih sepenuhnya!',
               style: TextStyle(fontStyle: FontStyle.italic, color: Colors.blue),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Sumber: Permenakertrans No. PER.13/MEN/X/2011 – Lampiran penjelasan risiko kebisingan terhadap kesehatan pekerja.',
+              style: TextStyle(
+                fontSize: 12,
+                fontStyle: FontStyle.italic,
+                color: Colors.black54,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -275,15 +288,12 @@ class EdukasiScreen extends StatelessWidget {
     );
   }
 
-  // Menerima BuildContext sebagai parameter untuk navigasi
   Widget _buildCallToAction(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.secondary.withOpacity(
-          0.1,
-        ), // Warna sekunder yang lebih terang
+        color: AppColors.secondary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: AppColors.secondary),
       ),
@@ -307,14 +317,13 @@ class EdukasiScreen extends StatelessWidget {
           const SizedBox(height: 10),
           ElevatedButton.icon(
             onPressed: () {
-              // Navigasi ke halaman NoiSense menggunakan named route
               Navigator.pushNamed(context, Routes.noisense);
             },
             icon: const Icon(Icons.wifi_tethering),
             label: const Text('Cek Kebisingan Sekarang!'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.secondary, // Warna tombol
-              foregroundColor: Colors.white, // Warna teks tombol
+              backgroundColor: AppColors.secondary,
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),

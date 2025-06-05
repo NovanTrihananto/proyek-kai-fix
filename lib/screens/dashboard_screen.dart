@@ -20,83 +20,96 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _isLoading = true;
 
   final PageController _pageController = PageController();
-  int _currentPage = 0;
+  final int _currentPage = 0;
 
   // Definisikan data depo Anda di sini dengan dua jalur gambar berbeda
   final List<DepoModel> _depots = [
-    DepoModel(
-      title: 'Depo Lokomotif Yogyakarta',
-      thumbnailImagePath: 'assets/images/lokoj.jpg', // Gambar untuk thumbnail
-      detailImagePath: 'assets/maps/lokoy.png', // Gambar berbeda untuk halaman detail
-      description:
-          'Depo Lokomotif Yogyakarta merupakan fasilitas pemeliharaan dan perawatan lokomotif yang mendukung operasional kereta api di wilayah Yogyakarta.',
-      employeeCount: '45 orang',
-      equipmentDescription:
-          'Terdapat peralatan untuk perawatan lokomotif seperti mesin las, lifting jack, dan alat ukur tekanan.',
-      capabilities:
-          'Depo ini mampu melakukan perawatan rutin, perbaikan kerusakan ringan hingga sedang, serta inspeksi keselamatan berkala terhadap lokomotif.',
-    ),
-    DepoModel(
-      title: 'Depo Lokomotif Solo Balapan',
-      thumbnailImagePath: 'assets/images/lokos.jpg',
-      detailImagePath: 'assets/maps/lokos.png', // Gambar detail yang berbeda
-      description:
-          'Depo Lokomotif Solo Balapan merupakan fasilitas pemeliharaan dan perawatan lokomotif yang mendukung operasional kereta api di wilayah Solo.',
-      employeeCount: '40 orang',
-      equipmentDescription:
-          'Dilengkapi dengan fasilitas perbaikan engine, sistem kelistrikan, dan bogie lokomotif.',
-      capabilities:
-          'Depo ini memiliki kemampuan untuk overhaul lokomotif, perbaikan kerusakan berat, dan pengujian performa mesin.',
-    ),
-    DepoModel(
-      title: 'Depo Kereta Yogyakarta',
-      thumbnailImagePath: 'assets/images/keretaj.png',
-      detailImagePath: 'assets/maps/keretay.png', // Gambar detail yang berbeda
-      description:
-          'Depo Kereta Yogyakarta merupakan fasilitas pemeliharaan dan perawatan kereta penumpang yang mendukung operasional kereta api di wilayah Yogyakarta.',
-      employeeCount: '55 orang',
-      equipmentDescription:
-          'Terdapat berbagai peralatan untuk perawatan interior, AC, sistem pintu, dan sistem kelistrikan kereta penumpang.',
-      capabilities:
-          'Depo ini mampu melakukan perawatan harian, bulanan, hingga tahunan untuk kereta penumpang, serta perbaikan kerusakan major.',
-    ),
-    DepoModel(
-      title: 'Depo Kereta Solo Balapan',
-      thumbnailImagePath: 'assets/images/keretas.jpeg',
-      detailImagePath: 'assets/maps/keretas.png', // Gambar detail yang berbeda
-      description:
-          'Depo Kereta Solo Balapan merupakan fasilitas pemeliharaan dan perawatan kereta penumpang yang mendukung operasional kereta api di wilayah Solo.',
-      employeeCount: '38 orang',
-      equipmentDescription:
-          'Fasilitas mencakup area pencucian otomatis, perbaikan sistem penerangan, dan pengecekan roda kereta.',
-      capabilities:
-          'Melayani inspeksi rutin, perbaikan minor, dan persiapan kereta sebelum keberangkatan untuk rute jarak dekat.',
-    ),
-    DepoModel(
-      title: 'Depo Gerbong Rewulu',
-      thumbnailImagePath: 'assets/images/rewulu.JPG',
-      detailImagePath: 'assets/maps/rewulu.png', // Gambar detail yang berbeda
-      description:
-          'Depo Gerbong Rewulu merupakan pusat perawatan dan perbaikan gerbong barang yang vital untuk distribusi logistik kereta api.',
-      employeeCount: '60 orang',
-      equipmentDescription:
-          'Dilengkapi dengan crane berkapasitas besar, alat press roda, dan area khusus untuk perbaikan sasis gerbong.',
-      capabilities:
-          'Depo ini mampu melakukan perbaikan struktur gerbong, penggantian roda, dan pengujian beban untuk berbagai jenis gerbong barang.',
-    ),
-    DepoModel(
-      title: 'Depo PUK Yogyakarta',
-      thumbnailImagePath: 'assets/images/puk.JPG',
-      detailImagePath: 'assets/maps/puky.png', // Gambar detail yang berbeda
-      description:
-          'Depo PUK (Perawatan Unit Khusus) Yogyakarta menangani perawatan dan perbaikan unit khusus perkeretaapian, seperti kereta inspeksi, kereta derek, dan alat berat rel.',
-      employeeCount: '30 orang',
-      equipmentDescription:
-          'Spesialisasi pada alat diagnostik elektronik, perbaikan sistem hidrolik, dan komponen presisi untuk unit khusus.',
-      capabilities:
-          'Fokus pada perawatan preventif dan korektif untuk memastikan kesiapan operasional unit khusus dalam mendukung infrastruktur dan keselamatan perkeretaapian.',
-    ),
-  ];
+  DepoModel(
+    title: 'Depo Lokomotif Yogyakarta',
+    thumbnailImagePath: 'assets/images/lokoj.jpg',
+    detailImagePath: 'assets/maps/lokoy.png',
+    description:
+        'Depo ini menangani perawatan ringan dan pengisian bahan bakar lokomotif diesel. Terletak dekat Stasiun Tugu, Yogyakarta.',
+    employeeCount: '90 orang',
+    equipmentDescription:
+        'Mesin las, lifting jack, alat ukur tekanan.',
+    capabilities:
+        'Dapat menangani hingga 20 lokomotif per hari untuk perawatan dan inspeksi rutin.',
+    loko:
+        'Armada : 32 Lokomotif dan 33 Kereta Rel Disel'
+  ),
+  DepoModel(
+    title: 'Depo Lokomotif Solo Balapan',
+    thumbnailImagePath: 'assets/images/lokos.jpg',
+    detailImagePath: 'assets/maps/lokos.png',
+    description:
+        'Depo ini melayani perawatan dan pengujian performa lokomotif diesel di wilayah Solo dan sekitarnya.',
+    employeeCount: '58 orang',
+    equipmentDescription:
+        'Fasilitas perbaikan engine, kelistrikan, dan bogie.',
+    capabilities:
+        'Mampu memperbaiki hingga 15 lokomotif per hari, termasuk perbaikan berat dan overhaul.',
+    loko:
+        'Armada : 19 Kereta Rel Disel'
+  ),
+  DepoModel(
+    title: 'Depo Kereta Yogyakarta',
+    thumbnailImagePath: 'assets/images/keretaj.png',
+    detailImagePath: 'assets/maps/keretay.png',
+    description:
+        'Depo ini fokus pada perawatan dan kebersihan kereta penumpang yang beroperasi dari dan ke Yogyakarta.',
+    employeeCount: '141 orang',
+    equipmentDescription:
+        'Peralatan AC, sistem pintu, dan kelistrikan kereta.',
+    capabilities:
+        'Dapat menangani hingga 25 rangkaian kereta penumpang per hari.',
+    loko:
+        'Armada : 141 Kereta'
+  ),
+  DepoModel(
+    title: 'Depo Kereta Solo Balapan',
+    thumbnailImagePath: 'assets/images/keretas.jpeg',
+    detailImagePath: 'assets/maps/keretas.png',
+    description:
+        'Mendukung operasional kereta lokal dan menengah melalui perawatan ringan dan pengecekan rutin.',
+    employeeCount: '109 orang',
+    equipmentDescription:
+        'Pencucian otomatis, pengecekan roda, dan penerangan.',
+    capabilities:
+        'Menangani sekitar 15 rangkaian kereta per hari untuk inspeksi dan persiapan keberangkatan.',
+    loko:
+        'Armada : 181 Kereta'
+  ),
+  DepoModel(
+    title: 'Depo Gerbong Rewulu',
+    thumbnailImagePath: 'assets/images/rewulu.JPG',
+    detailImagePath: 'assets/maps/rewulu.png',
+    description:
+        'Fasilitas distribusi bahan bakar dan perbaikan gerbong barang yang terhubung langsung dengan jalur kereta.',
+    employeeCount: '22 orang',
+    equipmentDescription:
+        'Crane besar, alat press roda, area perbaikan sasis.',
+    capabilities:
+        'Mampu memperbaiki hingga 10 gerbong barang secara bersamaan.',
+    loko:
+        'Armada : GK 30 Ton : 47, GB 25 Ton : 13, GD 40 Ton : 3 \d Jumlah Gerbong : 63',
+  ),
+  DepoModel(
+    title: 'Depo PUK Yogyakarta',
+    thumbnailImagePath: 'assets/images/puk.JPG',
+    detailImagePath: 'assets/maps/puky.png',
+    description:
+        'Menangani unit khusus seperti kereta inspeksi dan derek, dengan fokus pada sistem presisi dan keselamatan.',
+    employeeCount: '25 orang',
+    equipmentDescription:
+        'Alat diagnostik elektronik, sistem hidrolik, komponen presisi.',
+    capabilities:
+        'Mampu merawat hingga 5 unit khusus secara paralel.',
+    loko:
+        'Armada: ±6 unit kereta inspeksi dan alat berat rel',
+  ),
+];
+
 
   @override
   void initState() {
@@ -150,6 +163,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               employeeCount: depot.employeeCount,
               equipmentDescription: depot.equipmentDescription,
               capabilities: depot.capabilities,
+              loko: depot.loko,
             ),
           ),
         );
@@ -335,7 +349,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'Sarana dan Prasarana',
+                  'Informasi Depo',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

@@ -7,10 +7,8 @@ import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/noisense/noisense_screen.dart';
-import 'screens/noisense/location_info_screen.dart';
 import 'screens/feedback_screen.dart';
 import 'screens/panduan_screen.dart';
-import 'screens/fitur/sarana_screen.dart';
 import 'screens/noisense/barcode_scanner.dart';
 import 'constants/colors.dart';
 

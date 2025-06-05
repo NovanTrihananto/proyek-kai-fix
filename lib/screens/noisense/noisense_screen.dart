@@ -137,26 +137,50 @@ class _NoisenseScreenState extends State<NoisenseScreen> {
                         ),
                       )
                       : ListView.separated(
-                        itemCount: history.length,
-                        separatorBuilder: (_, __) => Divider(),
-                        itemBuilder: (context, index) {
-                          final entry = history[index];
-                          final value = entry['value'] ?? 'Tidak ada data';
-                          final time = DateTime.tryParse(
-                            entry['timestamp'] ?? '',
-                          );
-                          final formattedTime =
-                              time != null
-                                  ? '${time.day}/${time.month}/${time.year} ${time.hour}:${time.minute}'
-                                  : 'Waktu tidak valid';
+    itemCount: history.length,
+    separatorBuilder: (_, __) => SizedBox(height: 10),
+    itemBuilder: (context, index) {
+      final entry = history[index];
+      final value = entry['value'] ?? 'Tidak ada data';
+      final time = DateTime.tryParse(entry['timestamp'] ?? '');
+      final formattedTime = time != null
+          ? '${time.day}/${time.month}/${time.year} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}'
+          : 'Waktu tidak valid';
 
-                          return ListTile(
-                            leading: Icon(Icons.qr_code_2),
-                            title: Text(value),
-                            subtitle: Text(formattedTime),
-                          );
-                        },
-                      ),
+      return Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
+                SizedBox(width: 4),
+                Text(
+                  formattedTime,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  ),
+
             ),
           ],
         ),
