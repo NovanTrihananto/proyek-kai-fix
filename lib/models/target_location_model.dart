@@ -86,15 +86,6 @@ List<LokasiTrigger> triggerListLocation = [
       nama: 'DAOP 6 Yogyakarta',
       lokasiBising: [
         LokasiBising(
-          nama: 'LOSD MC',
-          tingkatKebisinganEstimasi: 'Tinggi',
-          keterangan:
-              'Lokasi ini sering digunakan untuk parkir kereta api yang sedang tidak beroperasi.',
-          longitude: 110.42275691028573,
-          latitude: -7.747996485379148,
-          triggerRadiusMeter: 20,
-        ),
-        LokasiBising(
           nama: 'Depo Kreta Yogyakarta',
           tingkatKebisinganEstimasi: 'Sedang',
           keterangan: '',
@@ -104,7 +95,7 @@ List<LokasiTrigger> triggerListLocation = [
         ),
         LokasiBising(
           nama: 'Depo Kreta maguwo',
-          tingkatKebisinganEstimasi: 'Tinggi',
+          tingkatKebisinganEstimasi: 'Sedang',
           keterangan: '',
           longitude: 110.4225161,
           latitude: -7.7481928,
