@@ -21,7 +21,7 @@ class DepoDetailPage extends StatelessWidget {
   });
 
   // Fungsi card yang fleksibel tanpa shadow
-  Widget _InfoCard({
+  Widget _infoCard({
     IconData? icon,
     required String title,
     required String content,
@@ -136,8 +136,7 @@ class DepoDetailPage extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // Deskripsi singkat tanpa ikon
-                  const SizedBox(height: 12),
-                  _InfoCard(
+                  _infoCard(
                     icon: null,
                     title: '',
                     content: description,
@@ -145,22 +144,22 @@ class DepoDetailPage extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   // Info lainnya
-                  _InfoCard(
+                  _infoCard(
                     icon: Icons.stars,
                     title: '',
                     content: 'Jumlah pegawai: $employeeCount',
                   ),
-                  _InfoCard(
+                  _infoCard(
                     icon: Icons.build,
                     title: '',
                     content: 'Fasilitas utama: $equipmentDescription',
                   ),
-                  _InfoCard(
+                  _infoCard(
                     icon: Icons.settings,
                     title: '',
                     content: 'Kemampuan depo: $capabilities',
                   ),
-                  _InfoCard(
+                  _infoCard(
                     icon: Icons.train,
                     title: '',
                     content: 'Armada yang tersedia: $loko',
