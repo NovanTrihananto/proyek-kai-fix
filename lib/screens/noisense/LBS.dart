@@ -60,7 +60,7 @@ class _LBSState extends State<LBS> {
           _currentDecibel = noiseReading.meanDecibel;
         });
 
-        if (_currentDecibel >= 110 && !_showWarningDialog) {
+        if (_currentDecibel >= 100 && !_showWarningDialog) {
           _showWarningDialog = true;
           _startAlertSoundLoop();
           _showWarningPopup();
