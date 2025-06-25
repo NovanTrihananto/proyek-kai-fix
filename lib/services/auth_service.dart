@@ -6,31 +6,18 @@ class AuthService {
   static const String _userKey = 'user_data';
   static const String _isLoggedInKey = 'is_logged_in';
 
-  // 🔄 Update user locally using SharedPreferences
-  Future<void> updateUser(UserModel user) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('username', user.username);
-  await prefs.setString('instansi', user.instansi);
-  await prefs.setString('id', user.id);
-  if (user.profileImageUrl != null) {
-    await prefs.setString('profileImageUrl', user.profileImageUrl!);
-  }
-}
-
-  // Login user (buat user baru tanpa id)
+  // 🔐 Login user baru (dengan nama dan instansi saja)
   Future<bool> login(String username, String instansi) async {
     try {
-      // Create a user model without id (pakai constructor create)
+      // Buat user baru dengan id unik
       final user = UserModel.create(
         username: username,
         instansi: instansi,
       );
 
-      // Store in shared preferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_userKey, jsonEncode(user.toMap()));
       await prefs.setBool(_isLoggedInKey, true);
-
       return true;
     } catch (e) {
       print('Login error: $e');
@@ -38,17 +25,7 @@ class AuthService {
     }
   }
 
-  // Check if user is logged in
-  Future<bool> isLoggedIn() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getBool(_isLoggedInKey) ?? false;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  // Get current user (pakai factory fromMap, id akan terbaca)
+  // ✅ Mengambil data user saat ini
   Future<UserModel?> getCurrentUser() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -65,9 +42,28 @@ class AuthService {
     }
   }
 
-  
+  // 🔄 Update data user (misal setelah edit nama atau instansi)
+  Future<void> updateUser(UserModel updatedUser) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_userKey, jsonEncode(updatedUser.toMap()));
+    } catch (e) {
+      print('Update user error: $e');
+    }
+  }
 
-  // Logout user
+  // ❓ Cek apakah user sedang login
+  Future<bool> isLoggedIn() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool(_isLoggedInKey) ?? false;
+    } catch (e) {
+      print('Check login error: $e');
+      return false;
+    }
+  }
+
+  // 🚪 Logout user
   Future<bool> logout() async {
     try {
       final prefs = await SharedPreferences.getInstance();

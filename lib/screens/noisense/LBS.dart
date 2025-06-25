@@ -8,6 +8,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kai/models/target_location_model.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:noise_meter/noise_meter.dart';
 import '../fitur/edukasi_screen.dart';
 
 class LBS extends StatefulWidget {
@@ -36,11 +37,64 @@ class _LBSState extends State<LBS> {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  NoiseMeter? _noiseMeter;
+  StreamSubscription<NoiseReading>? _noiseSubscription;
+  double _currentDecibel = 0.0;
+  bool _isRecording = false;
+
   @override
   void initState() {
     super.initState();
     _initLocationTracking();
     _initNotifications();
+    _initNoiseListener();
+  }
+
+  void _initNoiseListener() {
+    _noiseMeter = NoiseMeter();
+    try {
+     _noiseSubscription = _noiseMeter!.noise.listen((NoiseReading noiseReading) {
+        if (!mounted) return;
+
+        setState(() {
+          _currentDecibel = noiseReading.meanDecibel;
+        });
+
+        if (_currentDecibel >= 100 && !_showWarningDialog) {
+          _showWarningDialog = true;
+          _startAlertSoundLoop();
+          _showWarningPopup();
+          _showDangerNotification();
+        } else if (_currentDecibel < 85 && _showWarningDialog) {
+          _showWarningDialog = false;
+          _stopAlertSoundLoop();
+        }
+      });
+
+      setState(() {
+        _isRecording = true;
+      });
+    } catch (err) {
+      debugPrint("Error starting noise listener: $err");
+      setState(() {
+        _isRecording = false;
+      });
+    }
+  }
+
+  void onError(Object error) {
+    debugPrint("NoiseMeter error: $error");
+    setState(() {
+      _isRecording = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _noiseSubscription?.cancel();
+    _alertTimer?.cancel();
+    _audioPlayer.dispose();
+    super.dispose();
   }
 
   Future<void> _initNotifications() async {
@@ -186,25 +240,42 @@ class _LBSState extends State<LBS> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.warning_amber_rounded, size: 60, color: Colors.white),
+              const SizedBox(height: 16),
+              const Icon(
+                Icons.warning_amber_rounded,
+                size: 60,
+                color: Colors.white,
+              ),
               const SizedBox(height: 16),
               const Text(
                 "Peringatan Zona Merah!",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               const Text(
                 "Anda memasuki zona dengan tingkat kebisingan mencapai 110.3 dBA. Segera gunakan pelindung telinga.",
-                style: TextStyle(fontSize: 16, color: Colors.white70),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white70,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 12,
+                  ),
                 ),
                 onPressed: () {
                   setState(() {
@@ -214,7 +285,13 @@ class _LBSState extends State<LBS> {
                   Navigator.of(context).pop();
                   _showAPDPopup();
                 },
-                child: const Text("LANJUTKAN", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                child: const Text(
+                  "LANJUTKAN",
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
@@ -223,6 +300,7 @@ class _LBSState extends State<LBS> {
     },
   );
 }
+
 
 
   void _showAPDPopup() {
@@ -253,8 +331,10 @@ class _LBSState extends State<LBS> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.health_and_safety, size: 60, color: Colors.white),
-              const SizedBox(height: 16),
+               Image.asset(
+                'assets/images/earmuffs.png', // Pastikan gambar ini ada di folder assets/images/
+                height: 70,
+              ),
               const Text(
                 "Gunakan APD",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
@@ -407,8 +487,7 @@ class _LBSState extends State<LBS> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Deteksi Lokasi LBS"),
@@ -432,7 +511,7 @@ class _LBSState extends State<LBS> {
             ),
           ),
           Container(
-            height: 120,
+            height: 140,
             padding: const EdgeInsets.all(16),
             color: const Color(0xFF333232),
             child: SingleChildScrollView(
@@ -441,6 +520,11 @@ class _LBSState extends State<LBS> {
                 children: [
                   Text(_statusMessage, style: const TextStyle(fontSize: 16, color: Colors.white)),
                   const SizedBox(height: 10),
+                  Text(
+                    "Kebisingan saat ini: ${_currentDecibel.toStringAsFixed(1)} dBA",
+                    style: const TextStyle(fontSize: 14, color: Colors.white70),
+                  ),
+                  const SizedBox(height: 5),
                   ..._triggerStatus.map((status) =>
                       Text(status, style: const TextStyle(fontSize: 14, color: Colors.white70))),
                 ],

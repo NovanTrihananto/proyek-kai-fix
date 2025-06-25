@@ -38,7 +38,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     await AuthService().updateUser(updatedUser);
 
     if (mounted) {
-      Navigator.pop(context, updatedUser); // kirim kembali ke ProfileScreen
+      // ✅ Tampilkan notifikasi berhasil
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profil berhasil diperbarui.'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      // ✅ Kembalikan ke halaman sebelumnya (profile)
+      Future.delayed(const Duration(milliseconds: 500), () {
+        Navigator.pop(context, updatedUser);
+      });
     }
   }
 

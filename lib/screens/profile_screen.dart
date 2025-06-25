@@ -112,7 +112,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     );
 
                     if (updatedUser != null) {
-                      _reloadUser(); // ini akan memicu setState
+                      _reloadUser();
+                      Navigator.pop(
+                        context,
+                        'updated',
+                      ); // ← kirim sinyal ke dashboard
                     }
                   },
                 ),
@@ -149,24 +153,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           );
         },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pop(context);
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.grey),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.orange),
-            label: 'Profile',
-          ),
-        ],
       ),
     );
   }

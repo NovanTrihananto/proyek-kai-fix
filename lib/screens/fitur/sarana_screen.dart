@@ -20,47 +20,41 @@ class DepoDetailPage extends StatelessWidget {
     required this.loko,
   });
 
-  // Fungsi card yang fleksibel tanpa shadow
-  Widget _infoCard({
-    IconData? icon,
+  Widget _InfoCard({
+    required IconData icon,
     required String title,
     required String content,
   }) {
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
       color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (icon != null) ...[
-              Icon(icon, color: Colors.deepPurple, size: 28),
-              const SizedBox(width: 14),
-            ],
+            Icon(icon, color: Colors.deepPurple, size: 30),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (title.isNotEmpty)
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                        color: Colors.black87,
-                      ),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
                     ),
-                  if (title.isNotEmpty) const SizedBox(height: 6),
+                  ),
+                  const SizedBox(height: 4),
                   Text(
                     content,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.grey.shade800,
-                      height: 1.5,
+                    style: const TextStyle(
+                      fontSize: 14.5,
+                      color: Colors.black87,
+                      height: 1.4,
                     ),
                   ),
                 ],
@@ -74,8 +68,6 @@ class DepoDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isWideScreen = MediaQuery.of(context).size.width > 600;
-
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
@@ -85,9 +77,8 @@ class DepoDetailPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gambar utama
+            // Gambar peta depo
             ClipRRect(
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(24),
@@ -101,9 +92,9 @@ class DepoDetailPage extends StatelessWidget {
               ),
             ),
 
-            // Kartu isi
+            // Konten utama
             Container(
-              transform: Matrix4.translationValues(0, -20, 0),
+              transform: Matrix4.translationValues(0, -30, 0),
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -120,49 +111,58 @@ class DepoDetailPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Judul
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  // Judul depo
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
 
-                  // Deskripsi singkat tanpa ikon
-                  _infoCard(
-                    icon: null,
-                    title: '',
-                    content: description,
+                  // Deskripsi
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Colors.black87,
+                      height: 1.5,
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Judul bagian Sarana Prasarana
+                  const Text(
+                    'SARANA PRASARANA',
+                    style: TextStyle(
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 12),
 
-                  // Info lainnya
-                  _infoCard(
-                    icon: Icons.stars,
-                    title: '',
-                    content: 'Jumlah pegawai: $employeeCount',
+                  // Kartu info
+                  _InfoCard(
+                    icon: Icons.people,
+                    title: 'Jumlah Pegawai',
+                    content: '$employeeCount Orang',
                   ),
-                  _infoCard(
-                    icon: Icons.build,
-                    title: '',
-                    content: 'Fasilitas utama: $equipmentDescription',
+                  _InfoCard(
+                    icon: Icons.factory,
+                    title: 'Fasilitas Utama',
+                    content: equipmentDescription,
                   ),
-                  _infoCard(
-                    icon: Icons.settings,
-                    title: '',
-                    content: 'Kemampuan depo: $capabilities',
+                  _InfoCard(
+                    icon: Icons.home_repair_service_sharp,
+                    title: 'Kemampuan Depo',
+                    content: capabilities,
                   ),
-                  _infoCard(
-                    icon: Icons.train,
-                    title: '',
-                    content: 'Armada yang tersedia: $loko',
+                  _InfoCard(
+                    icon: Icons.train_outlined,
+                    title: 'Armada yang Tersedia',
+                    content: loko,
                   ),
                 ],
               ),
