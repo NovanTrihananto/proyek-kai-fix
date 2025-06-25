@@ -33,6 +33,7 @@ dependencies:
   geolocator: ^10.1.0
   shared_preferences: ^2.2.2
   intl: ^0.20.2
+  flutter_launcher_icons: ^0.14.4
   flutter:
     sdk: flutter
 
@@ -49,6 +50,11 @@ dependencies:
   flutter_local_notifications: ^19.2.1
   noise_meter: ^5.0.2
   
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/kai.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
 
 dev_dependencies:
   flutter_test:
