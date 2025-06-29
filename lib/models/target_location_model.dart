@@ -152,10 +152,10 @@ List<LokasiTrigger> triggerListLocation = [
         ),
          LokasiBising(
           nama: 'Stabil',
-          tingkatKebisinganEstimasi: 'Sedang',
+          tingkatKebisinganEstimasi: 'Tinggi',
           keterangan: 'Ini adalah tempat Test mesin kereta',
-          longitude:  110.36191434515389, 
-          latitude: -7.788716453983684,   
+          longitude:  109.66172727673602,
+          latitude: -7.520579793225823, 
           triggerRadiusMeter: 27,
         ),
       ],

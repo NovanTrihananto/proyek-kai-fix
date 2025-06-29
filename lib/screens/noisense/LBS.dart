@@ -10,6 +10,7 @@ import 'package:kai/models/target_location_model.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:noise_meter/noise_meter.dart';
 import '../fitur/edukasi_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class LBS extends StatefulWidget {
   final String? barcode;
@@ -27,12 +28,19 @@ class _LBSState extends State<LBS> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _sudahBunyikan = false;
 
+  List<double> _noiseBuffer = [];
+  final int _bufferDurationInSeconds = 20;
+  final double _thresholdDb = 80.0;
+
   Set<Marker> _markers = {};
   Set<Polygon> _polygons = {};
   List<String> _triggerStatus = [];
 
   bool _showWarningDialog = false;
   Timer? _alertTimer;
+  Timer? _displayTimer;
+  Timer? _noiseCheckTimer;
+  List<double> _recentDecibelSamples = [];
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -45,29 +53,56 @@ class _LBSState extends State<LBS> {
   @override
   void initState() {
     super.initState();
-    _initLocationTracking();
-    _initNotifications();
-    _initNoiseListener();
+    _requestMicrophonePermission().then((_) {
+      _initLocationTracking();
+      _initNotifications();
+      _initNoiseListener();
+    });
+  }
+
+  Future<void> _requestMicrophonePermission() async {
+    var status = await Permission.microphone.status;
+    if (!status.isGranted) {
+      await Permission.microphone.request();
+    }
   }
 
   void _initNoiseListener() {
     _noiseMeter = NoiseMeter();
+
     try {
-     _noiseSubscription = _noiseMeter!.noise.listen((NoiseReading noiseReading) {
+      _noiseSubscription = _noiseMeter!.noise.listen((NoiseReading noiseReading) {
         if (!mounted) return;
+        _recentDecibelSamples.add(noiseReading.meanDecibel);
+      });
 
-        setState(() {
-          _currentDecibel = noiseReading.meanDecibel;
-        });
+      _displayTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!mounted) return;
+        if (_recentDecibelSamples.isNotEmpty) {
+          double avg = _recentDecibelSamples.reduce((a, b) => a + b) / _recentDecibelSamples.length;
+          setState(() {
+            _currentDecibel = avg;
+          });
+          _noiseBuffer.add(avg);
+          if (_noiseBuffer.length > _bufferDurationInSeconds) {
+            _noiseBuffer.removeAt(0);
+          }
+          _recentDecibelSamples.clear();
+        }
+      });
 
-        if (_currentDecibel >= 100 && !_showWarningDialog) {
-          _showWarningDialog = true;
-          _startAlertSoundLoop();
-          _showWarningPopup();
-          _showDangerNotification();
-        } else if (_currentDecibel < 85 && _showWarningDialog) {
-          _showWarningDialog = false;
-          _stopAlertSoundLoop();
+      _noiseCheckTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (_noiseBuffer.length >= _bufferDurationInSeconds) {
+          bool isConsistentlyLoud = _noiseBuffer.every((db) => db > _thresholdDb);
+          if (isConsistentlyLoud && !_showWarningDialog) {
+            _showWarningDialog = true;
+            _startAlertSoundLoop();
+            _showWarningPopup();
+            _showDangerNotification();
+          } else if (!isConsistentlyLoud && _showWarningDialog) {
+            _showWarningDialog = false;
+            _stopAlertSoundLoop();
+          }
         }
       });
 
@@ -93,6 +128,8 @@ class _LBSState extends State<LBS> {
   void dispose() {
     _noiseSubscription?.cancel();
     _alertTimer?.cancel();
+    _displayTimer?.cancel();
+    _noiseCheckTimer?.cancel();
     _audioPlayer.dispose();
     super.dispose();
   }
@@ -119,7 +156,7 @@ class _LBSState extends State<LBS> {
     await flutterLocalNotificationsPlugin.show(
       0,
       '⚠️ PERINGATAN!',
-      'Anda memasuki zona kebisingan tinggi. Gunakan pelindung telinga!',
+      'Anda memasuki zona kebisingan mencapai 110.3 dBA. Gunakan pelindung telinga!',
       notificationDetails,
     );
   }
@@ -342,7 +379,7 @@ class _LBSState extends State<LBS> {
               ),
               const SizedBox(height: 12),
               const Text(
-                "Untuk melindungi pendengaran, gunakan earmuff atau earplug saat berada di zona kebisingan tinggi.",
+                "Untuk melindungi pendengaran, gunakan earmuff atau earplug saat berada di zona kebisingan diatas 110.3 dBA",
                 style: TextStyle(fontSize: 16, color: Colors.white70),
                 textAlign: TextAlign.center,
               ),
@@ -427,17 +464,17 @@ class _LBSState extends State<LBS> {
         Color strokeColor = Colors.green;
 
         if (tingkat == "tinggi") {
-          status = "🔴 ${bising.nama} - Tingkat kebisingan: Tinggi";
+          status = "🔴 ${bising.nama} - Area Berbahaya! Tingkat kebisingan mencapai 110.3 dBA";
           hue = BitmapDescriptor.hueRed;
           fillColor = Colors.red.withOpacity(0.3);
           strokeColor = Colors.red;
         } else if (tingkat == "sedang") {
-          status = "🟡 ${bising.nama} - Tingkat kebisingan: Sedang";
+          status = "🟡 ${bising.nama} - Area Hati-hati! Tingkat kebisingan mencapai 100.3 dBA";
           hue = BitmapDescriptor.hueYellow;
           fillColor = Colors.yellow.withOpacity(0.3);
           strokeColor = Colors.yellow;
         } else if (tingkat == "rendah") {
-          status = "🟢 ${bising.nama} - Tingkat kebisingan: Rendah";
+          status = "🟢 ${bising.nama} - Anda sedang dalam zona aman kebisingan. Tetap jaga keselamatan";
         }
 
         newMarkers.add(Marker(
