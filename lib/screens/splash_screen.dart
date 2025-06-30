@@ -83,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen>
                 left: 0,
                 right: 0,
                 child: Text(
-                  '© 2025 KAI NoiSense. All rights reserved.',
+                  '© 2025 KAI NoiSense. Created by Kicau Mania DevMob.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white70,

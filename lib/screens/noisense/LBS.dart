@@ -29,7 +29,7 @@ class _LBSState extends State<LBS> {
   bool _sudahBunyikan = false;
 
   List<double> _noiseBuffer = [];
-  final int _bufferDurationInSeconds = 20;
+  final int _bufferDurationInSeconds = 5;
   final double _thresholdDb = 80.0;
 
   Set<Marker> _markers = {};
@@ -423,7 +423,60 @@ class _LBSState extends State<LBS> {
   );
 }
 
+  double get _safeDecibel {
+    if (_currentDecibel.isNaN || _currentDecibel.isInfinite) {
+      return 0.0;
+    }
+    return _currentDecibel;
+  }
 
+  double _getPercentage(double decibel) {
+    if (decibel.isNaN || decibel.isInfinite) {
+      return 0.0;
+    }
+    return (decibel / 120).clamp(0.0, 1.0);
+  }
+
+  int _getPercentageInt(double decibel) {
+    if (decibel.isNaN || decibel.isInfinite) {
+      return 0;
+    }
+    double percentage = (decibel / 120 * 100);
+    if (percentage.isNaN || percentage.isInfinite) {
+      return 0;
+    }
+    return percentage.round().clamp(0, 100);
+  }
+
+  Color _getStatusColor(double decibel) {
+    if (decibel.isNaN || decibel.isInfinite || decibel < 0) {
+      return Colors.grey;
+    }
+    if (decibel < 40) return Colors.green;
+    if (decibel < 70) return Colors.yellow;
+    if (decibel < 80) return Colors.orange;
+    return Colors.red;
+  }
+
+  IconData _getStatusIcon(double decibel) {
+    if (decibel.isNaN || decibel.isInfinite || decibel < 0) {
+      return Icons.signal_cellular_off;
+    }
+    if (decibel < 40) return Icons.volume_mute;
+    if (decibel < 70) return Icons.volume_down;
+    if (decibel < 80) return Icons.volume_up;
+    return Icons.volume_up;
+  }
+
+  String _getStatusText(double decibel) {
+    if (decibel.isNaN || decibel.isInfinite || decibel < 0) {
+      return "ERROR";
+    }
+    if (decibel < 40) return "TENANG";
+    if (decibel < 70) return "NORMAL";
+    if (decibel < 80) return "BERISIK";
+    return "SANGAT BERISIK";
+  }
 
   Future<void> _cekTrigger() async {
     if (_currentPosition == null) return;
@@ -548,26 +601,209 @@ class _LBSState extends State<LBS> {
             ),
           ),
           Container(
-            height: 140,
-            padding: const EdgeInsets.all(16),
-            color: const Color(0xFF333232),
-            child: SingleChildScrollView(
+            constraints: const BoxConstraints(minHeight: 160),
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF2C3E50),
+                  const Color(0xFF34495E),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(_statusMessage, style: const TextStyle(fontSize: 16, color: Colors.white)),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Kebisingan saat ini: ${_currentDecibel.toStringAsFixed(1)} dBA",
-                    style: const TextStyle(fontSize: 14, color: Colors.white70),
+                  // Header dengan status utama
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: _getStatusColor(_safeDecibel),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _getStatusIcon(_safeDecibel),
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  _getStatusText(_safeDecibel),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.volume_up,
+                        color: Colors.white70,
+                        size: 18,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 5),
-                  ..._triggerStatus.map((status) =>
-                      Text(status, style: const TextStyle(fontSize: 14, color: Colors.white70))),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Level kebisingan utama dengan visual yang menarik
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  "${_safeDecibel.toStringAsFixed(1)}",
+                                  style: const TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    height: 1,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 2),
+                                  child: Text(
+                                    "dBA",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Visual bar indicator
+                      Expanded(
+                        flex: 1,
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: FractionallySizedBox(
+                                widthFactor: _getPercentage(_safeDecibel),
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: _getStatusColor(_safeDecibel),
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "${_getPercentageInt(_safeDecibel)}%",
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.white60,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Alert status dengan design yang lebih baik
+                  if (_triggerStatus.isNotEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.orange.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.warning_amber_rounded,
+                                color: Colors.orange,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                "Alert Aktif",
+                                style: const TextStyle(
+                                  color: Colors.orange,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          ..._triggerStatus.map((status) => Padding(
+                            padding: const EdgeInsets.only(left: 18, top: 1),
+                            child: Text(
+                              status,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.white70,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          )),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
-          ),
+          )
         ],
       ),
     );

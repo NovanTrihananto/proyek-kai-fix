@@ -36,7 +36,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     capabilities:
         'Dapat menangani hingga 20 lokomotif per hari untuk perawatan dan inspeksi rutin.',
     loko:
-        'Armada : 32 Lokomotif dan 33 Kereta Rel Disel'
+        'Armada : 32 Lokomotif dan 33 Kereta Rel Disel',
+    rescueTrain: 'Rescue Train: 1 Unit',
   ),
   DepoModel(
     title: 'Depo Lokomotif Solo Balapan',
@@ -164,6 +165,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               equipmentDescription: depot.equipmentDescription,
               capabilities: depot.capabilities,
               loko: depot.loko,
+              rescueTrain: depot.rescueTrain, // ← Tambahkan ini di sini
             ),
           ),
         );
@@ -269,10 +271,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ],
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.notifications, color: Colors.white),
-                      onPressed: () {},
                     ),
                   ],
                 ),

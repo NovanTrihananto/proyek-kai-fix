@@ -8,6 +8,8 @@ class DepoDetailPage extends StatelessWidget {
   final String equipmentDescription;
   final String capabilities;
   final String loko;
+  final String? rescueTrain; // nullable
+
 
   const DepoDetailPage({
     super.key,
@@ -18,6 +20,7 @@ class DepoDetailPage extends StatelessWidget {
     required this.equipmentDescription,
     required this.capabilities,
     required this.loko,
+    this.rescueTrain,
   });
 
   Widget _InfoCard({
@@ -70,10 +73,22 @@ class DepoDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: Colors.deepPurple,
-        elevation: 2,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF8A2387), Color(0xFFE94057)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          title: Text(title),
+          backgroundColor: Colors.transparent,
+          elevation: 2,
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -135,7 +150,7 @@ class DepoDetailPage extends StatelessWidget {
 
                   // Judul bagian Sarana Prasarana
                   const Text(
-                    'SARANA PRASARANA',
+                    'SARANA',
                     style: TextStyle(
                       fontSize: 16.5,
                       fontWeight: FontWeight.bold,
@@ -163,6 +178,12 @@ class DepoDetailPage extends StatelessWidget {
                     icon: Icons.train_outlined,
                     title: 'Armada yang Tersedia',
                     content: loko,
+                  ),
+                  if (rescueTrain != null && rescueTrain!.isNotEmpty)
+                  _InfoCard(
+                    icon: Icons.fire_truck_outlined,
+                    title: 'Rescue Train',
+                    content: rescueTrain!,
                   ),
                 ],
               ),

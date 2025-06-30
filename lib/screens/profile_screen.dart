@@ -48,9 +48,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil Pengguna'),
-        backgroundColor: AppColors.primary,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: AppBar(
+          title: const Text(
+            'Profil Pengguna',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 4,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF8A2387), Color(0xFFE94057)
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+        ),
       ),
       body: FutureBuilder<Map<String, String>>(
         future: _userFuture,
@@ -65,11 +83,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               CircleAvatar(
                 radius: 60,
-                backgroundImage:
-                    user['profileImageUrl']!.isNotEmpty
-                        ? NetworkImage(user['profileImageUrl']!)
-                        : const AssetImage('assets/images/avatar.png')
-                            as ImageProvider,
+                backgroundImage: user['profileImageUrl']!.isNotEmpty
+                    ? NetworkImage(user['profileImageUrl']!)
+                    : const AssetImage('assets/images/avatar.png')
+                        as ImageProvider,
               ),
               const SizedBox(height: 16),
               Text(
@@ -99,15 +116,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     final updatedUser = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder:
-                            (_) => EditProfileScreen(
-                              user: UserModel(
-                                id: user['id']!,
-                                username: user['username']!,
-                                instansi: user['instansi']!,
-                                profileImageUrl: user['profileImageUrl'],
-                              ),
-                            ),
+                        builder: (_) => EditProfileScreen(
+                          user: UserModel(
+                            id: user['id']!,
+                            username: user['username']!,
+                            instansi: user['instansi']!,
+                            profileImageUrl: user['profileImageUrl'],
+                          ),
+                        ),
                       ),
                     );
 
@@ -116,7 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.pop(
                         context,
                         'updated',
-                      ); // ← kirim sinyal ke dashboard
+                      ); // kirim sinyal ke dashboard
                     }
                   },
                 ),
@@ -137,9 +153,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: () async {
                     final success = await AuthService().logout();
                     if (success && context.mounted) {
-                      Navigator.of(
-                        context,
-                      ).pushNamedAndRemoveUntil('/login', (route) => false);
+                      Navigator.of(context)
+                          .pushNamedAndRemoveUntil('/login', (route) => false);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
