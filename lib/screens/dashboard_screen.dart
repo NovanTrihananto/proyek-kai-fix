@@ -34,7 +34,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     equipmentDescription:
         'Mesin las, lifting jack, alat ukur tekanan.',
     capabilities:
-        'Dapat menangani hingga 20 lokomotif per hari untuk perawatan dan inspeksi rutin.',
+        'Dapat menangani hingga 20 lokomotif saat daily check.',
     loko:
         'Armada : 32 Lokomotif dan 33 Kereta Rel Disel',
     rescueTrain: 'Rescue Train: 1 Unit',
@@ -49,7 +49,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     equipmentDescription:
         'Fasilitas perbaikan engine, kelistrikan, dan bogie.',
     capabilities:
-        'Mampu memperbaiki hingga 15 lokomotif per hari, termasuk perbaikan berat dan overhaul.',
+        'Mampu memperbaiki hingga 15 lokomotif saat daily check.',
     loko:
         'Armada : 19 Kereta Rel Disel'
   ),
@@ -63,7 +63,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     equipmentDescription:
         'Peralatan AC, sistem pintu, dan kelistrikan kereta.',
     capabilities:
-        'Dapat menangani hingga 25 rangkaian kereta penumpang per hari.',
+        'Dapat menangani hingga 25 rangkaian kereta penumpang saat daily check.',
     loko:
         'Armada : 141 Kereta'
   ),
@@ -77,7 +77,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     equipmentDescription:
         'Pencucian otomatis, pengecekan roda, dan penerangan.',
     capabilities:
-        'Menangani sekitar 15 rangkaian kereta per hari untuk inspeksi dan persiapan keberangkatan.',
+        'Menangani sekitar 15 rangkaian kereta saat daily check.',
     loko:
         'Armada : 181 Kereta'
   ),
@@ -91,7 +91,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     equipmentDescription:
         'Crane besar, alat press roda, area perbaikan sasis.',
     capabilities:
-        'Mampu memperbaiki hingga 10 gerbong barang secara bersamaan.',
+        'Mampu memperbaiki hingga 10 gerbong barang saat daily check.',
     loko:
         'Armada : GK 30 Ton : 47, GB 25 Ton : 13, GD 40 Ton : 3 \d Jumlah Gerbong : 63',
   ),
@@ -105,7 +105,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     equipmentDescription:
         'Alat diagnostik elektronik, sistem hidrolik, komponen presisi.',
     capabilities:
-        'Mampu merawat hingga 5 unit khusus secara paralel.',
+        'Mampu merawat hingga 5 unit khusus saat daily check.',
     loko:
         'Armada: ±6 unit kereta inspeksi dan alat berat rel',
   ),

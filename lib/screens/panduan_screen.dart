@@ -37,16 +37,6 @@ class PanduanScreen extends StatelessWidget {
       'desc': 'Kirim saran atau kritik melalui menu Feedback.',
     },
     {
-      'icon': Icons.login,
-      'title': 'Login',
-      'desc': 'Masukkan username dan instansi Anda di halaman login.',
-    },
-    {
-      'icon': Icons.dashboard,
-      'title': 'Dashboard',
-      'desc': 'Setelah login, Anda akan diarahkan ke dashboard utama.',
-    },
-    {
       'icon': Icons.business,
       'title': 'Informasi Depo',
       'desc': 'Informasi fasilitas yang tersedia dapat diakses di sini.',

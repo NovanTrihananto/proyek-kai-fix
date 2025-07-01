@@ -27,9 +27,11 @@ class _LBSState extends State<LBS> {
   LatLng _initialCameraPosition = const LatLng(-6.200000, 106.816666);
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _sudahBunyikan = false;
+  bool _hasTriggeredWarning = false;
+
 
   List<double> _noiseBuffer = [];
-  final int _bufferDurationInSeconds = 5;
+  final int _bufferDurationInSeconds = 3;
   final double _thresholdDb = 80.0;
 
   Set<Marker> _markers = {};
@@ -71,7 +73,9 @@ class _LBSState extends State<LBS> {
     _noiseMeter = NoiseMeter();
 
     try {
-      _noiseSubscription = _noiseMeter!.noise.listen((NoiseReading noiseReading) {
+      _noiseSubscription = _noiseMeter!.noise.listen((
+        NoiseReading noiseReading,
+      ) {
         if (!mounted) return;
         _recentDecibelSamples.add(noiseReading.meanDecibel);
       });
@@ -79,7 +83,9 @@ class _LBSState extends State<LBS> {
       _displayTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (!mounted) return;
         if (_recentDecibelSamples.isNotEmpty) {
-          double avg = _recentDecibelSamples.reduce((a, b) => a + b) / _recentDecibelSamples.length;
+          double avg =
+              _recentDecibelSamples.reduce((a, b) => a + b) /
+              _recentDecibelSamples.length;
           setState(() {
             _currentDecibel = avg;
           });
@@ -94,18 +100,27 @@ class _LBSState extends State<LBS> {
       _noiseCheckTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (_noiseBuffer.length >= _bufferDurationInSeconds) {
           bool isConsistentlyLoud = _noiseBuffer.every((db) => db > _thresholdDb);
-          if (isConsistentlyLoud && !_showWarningDialog) {
+          bool hasDroppedBelow60 = _noiseBuffer.any((db) => db < 60);
+
+          if (hasDroppedBelow60) {
+            _hasTriggeredWarning = false;
+          }
+
+          if (isConsistentlyLoud && !_hasTriggeredWarning) {
+            _hasTriggeredWarning = true;
             _showWarningDialog = true;
             _startAlertSoundLoop();
             _showWarningPopup();
             _showDangerNotification();
-          } else if (!isConsistentlyLoud && _showWarningDialog) {
+          }
+
+          if (!isConsistentlyLoud && _showWarningDialog) {
             _showWarningDialog = false;
             _stopAlertSoundLoop();
           }
         }
       });
-
+      
       setState(() {
         _isRecording = true;
       });
@@ -135,7 +150,9 @@ class _LBSState extends State<LBS> {
   }
 
   Future<void> _initNotifications() async {
-    const androidInitSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidInitSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const initSettings = InitializationSettings(android: androidInitSettings);
     await flutterLocalNotificationsPlugin.initialize(initSettings);
   }
@@ -224,7 +241,8 @@ class _LBSState extends State<LBS> {
     int intersectCount = 0;
     for (int j = 0; j < polygon.length; j++) {
       int i = (j + 1) % polygon.length;
-      if (((polygon[j].latitude > point.latitude) != (polygon[i].latitude > point.latitude)) &&
+      if (((polygon[j].latitude > point.latitude) !=
+              (polygon[i].latitude > point.latitude)) &&
           (point.longitude <
               (polygon[i].longitude - polygon[j].longitude) *
                       (point.latitude - polygon[j].latitude) /
@@ -250,178 +268,205 @@ class _LBSState extends State<LBS> {
   }
 
   void _showWarningPopup() {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Colors.redAccent, Colors.deepOrange],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black45,
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ],
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 16),
-              const Icon(
-                Icons.warning_amber_rounded,
-                size: 60,
-                color: Colors.white,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Colors.redAccent, Colors.deepOrange],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const SizedBox(height: 16),
-              const Text(
-                "Peringatan Zona Merah!",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black45,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 16),
+                const Icon(
+                  Icons.warning_amber_rounded,
+                  size: 60,
                   color: Colors.white,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                "Anda memasuki zona dengan tingkat kebisingan mencapai 110.3 dBA. Segera gunakan pelindung telinga.",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 12,
-                  ),
-                ),
-                onPressed: () {
-                  setState(() {
-                    _showWarningDialog = false;
-                  });
-                  _stopAlertSoundLoop();
-                  Navigator.of(context).pop();
-                  _showAPDPopup();
-                },
-                child: const Text(
-                  "LANJUTKAN",
+                const SizedBox(height: 16),
+                const Text(
+                  "Peringatan Zona Merah!",
                   style: TextStyle(
-                    color: Colors.redAccent,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "Anda memasuki zona dengan tingkat kebisingan mencapai 110.3 dBA. Segera gunakan pelindung telinga.",
+                  style: TextStyle(fontSize: 16, color: Colors.white70),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 12,
+                    ),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _showWarningDialog = false;
+                    });
+                    _stopAlertSoundLoop();
+                    Navigator.of(context).pop();
+                    _showAPDPopup();
+                  },
+                  child: const Text(
+                    "LANJUTKAN",
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
-
-
+        );
+      },
+    );
+  }
 
   void _showAPDPopup() {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Colors.green, Colors.teal],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black45,
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ],
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-               Image.asset(
-                'assets/images/earmuffs.png', // Pastikan gambar ini ada di folder assets/images/
-                height: 70,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Colors.green, Colors.teal],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const Text(
-                "Gunakan APD",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                "Untuk melindungi pendengaran, gunakan earmuff atau earplug saat berada di zona kebisingan diatas 110.3 dBA",
-                style: TextStyle(fontSize: 16, color: Colors.white70),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text("TUTUP", style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold)),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black45,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(
+                  'assets/images/earmuffs.png', // Pastikan gambar ini ada di folder assets/images/
+                  height: 70,
+                ),
+                const Text(
+                  "Gunakan APD",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orangeAccent,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "Untuk melindungi pendengaran, gunakan earmuff atau earplug saat berada di zona kebisingan diatas 110.3 dBA",
+                  style: TextStyle(fontSize: 16, color: Colors.white70),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text(
+                        "TUTUP",
+                        style: TextStyle(
+                          color: Colors.teal,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const EdukasiScreen()),
-                      );
-                    },
-                    child: const Text("LIHAT EDUKASI", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  ),
-                ],
-              ),
-            ],
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orangeAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const EdukasiScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "LIHAT EDUKASI",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
   double get _safeDecibel {
     if (_currentDecibel.isNaN || _currentDecibel.isInfinite) {
@@ -435,17 +480,6 @@ class _LBSState extends State<LBS> {
       return 0.0;
     }
     return (decibel / 120).clamp(0.0, 1.0);
-  }
-
-  int _getPercentageInt(double decibel) {
-    if (decibel.isNaN || decibel.isInfinite) {
-      return 0;
-    }
-    double percentage = (decibel / 120 * 100);
-    if (percentage.isNaN || percentage.isInfinite) {
-      return 0;
-    }
-    return percentage.round().clamp(0, 100);
   }
 
   Color _getStatusColor(double decibel) {
@@ -517,33 +551,43 @@ class _LBSState extends State<LBS> {
         Color strokeColor = Colors.green;
 
         if (tingkat == "tinggi") {
-          status = "🔴 ${bising.nama} - Area Berbahaya! Tingkat kebisingan mencapai 110.3 dBA";
+          status =
+              "🔴 ${bising.nama} - Area Berbahaya! Tingkat kebisingan mencapai 110.3 dBA";
           hue = BitmapDescriptor.hueRed;
           fillColor = Colors.red.withOpacity(0.3);
           strokeColor = Colors.red;
         } else if (tingkat == "sedang") {
-          status = "🟡 ${bising.nama} - Area Hati-hati! Tingkat kebisingan mencapai 100.3 dBA";
+          status =
+              "🟡 ${bising.nama} - Area Hati-hati! Tingkat kebisingan mencapai 100.3 dBA";
           hue = BitmapDescriptor.hueYellow;
           fillColor = Colors.yellow.withOpacity(0.3);
           strokeColor = Colors.yellow;
         } else if (tingkat == "rendah") {
-          status = "🟢 ${bising.nama} - Anda sedang dalam zona aman kebisingan. Tetap jaga keselamatan";
+          status =
+              "🟢 ${bising.nama} - Anda sedang dalam zona aman kebisingan. Tetap jaga keselamatan";
         }
 
-        newMarkers.add(Marker(
-          markerId: MarkerId(bising.nama ?? bising.hashCode.toString()),
-          position: LatLng(bising.latitude!, bising.longitude!),
-          icon: BitmapDescriptor.defaultMarkerWithHue(hue),
-          infoWindow: InfoWindow(title: bising.nama, snippet: bising.keterangan),
-        ));
+        newMarkers.add(
+          Marker(
+            markerId: MarkerId(bising.nama ?? bising.hashCode.toString()),
+            position: LatLng(bising.latitude!, bising.longitude!),
+            icon: BitmapDescriptor.defaultMarkerWithHue(hue),
+            infoWindow: InfoWindow(
+              title: bising.nama,
+              snippet: bising.keterangan,
+            ),
+          ),
+        );
 
-        newPolygons.add(Polygon(
-          polygonId: PolygonId('box_${bising.nama}'),
-          points: polygonPoints,
-          fillColor: fillColor,
-          strokeColor: strokeColor,
-          strokeWidth: 2,
-        ));
+        newPolygons.add(
+          Polygon(
+            polygonId: PolygonId('box_${bising.nama}'),
+            points: polygonPoints,
+            fillColor: fillColor,
+            strokeColor: strokeColor,
+            strokeWidth: 2,
+          ),
+        );
 
         if (isInside) {
           if (status.isNotEmpty) newStatus.add(status);
@@ -570,14 +614,15 @@ class _LBSState extends State<LBS> {
         _markers = newMarkers;
         _polygons = newPolygons;
         _triggerStatus = newStatus;
-        _statusMessage = _triggerStatus.isEmpty
-            ? "Tidak ada lokasi dalam radius yang terdeteksi"
-            : "${_triggerStatus.length} lokasi terdeteksi!";
+        _statusMessage =
+            _triggerStatus.isEmpty
+                ? "Tidak ada lokasi dalam radius yang terdeteksi"
+                : "${_triggerStatus.length} lokasi terdeteksi!";
       });
     }
   }
 
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Deteksi Lokasi LBS"),
@@ -605,10 +650,7 @@ class _LBSState extends State<LBS> {
             margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  const Color(0xFF2C3E50),
-                  const Color(0xFF34495E),
-                ],
+                colors: [const Color(0xFF2C3E50), const Color(0xFF34495E)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -632,7 +674,10 @@ class _LBSState extends State<LBS> {
                     children: [
                       Flexible(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: _getStatusColor(_safeDecibel),
                             borderRadius: BorderRadius.circular(16),
@@ -662,16 +707,12 @@ class _LBSState extends State<LBS> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Icon(
-                        Icons.volume_up,
-                        color: Colors.white70,
-                        size: 18,
-                      ),
+                      Icon(Icons.volume_up, color: Colors.white70, size: 18),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Level kebisingan utama dengan visual yang menarik
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -734,21 +775,14 @@ class _LBSState extends State<LBS> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              "${_getPercentageInt(_safeDecibel)}%",
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.white60,
-                              ),
-                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Alert status dengan design yang lebih baik
                   if (_triggerStatus.isNotEmpty)
                     Container(
@@ -785,25 +819,27 @@ class _LBSState extends State<LBS> {
                             ],
                           ),
                           const SizedBox(height: 4),
-                          ..._triggerStatus.map((status) => Padding(
-                            padding: const EdgeInsets.only(left: 18, top: 1),
-                            child: Text(
-                              status,
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.white70,
+                          ..._triggerStatus.map(
+                            (status) => Padding(
+                              padding: const EdgeInsets.only(left: 18, top: 1),
+                              child: Text(
+                                status,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.white70,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
                               ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
                             ),
-                          )),
+                          ),
                         ],
                       ),
                     ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );

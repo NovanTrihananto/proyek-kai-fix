@@ -162,7 +162,7 @@ class DepoDetailPage extends StatelessWidget {
                   _InfoCard(
                     icon: Icons.people,
                     title: 'Jumlah Pegawai',
-                    content: '$employeeCount Orang',
+                    content: '$employeeCount',
                   ),
                   _InfoCard(
                     icon: Icons.factory,
